@@ -1,0 +1,18 @@
+{
+  "name": "erl",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "apps/*"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "NODE_ENV=production bun --filter '*' build && bun scripts/build.bun.sh",
+    "start": "NODE_ENV=production cd dist && bun server.js"
+  }
+}
