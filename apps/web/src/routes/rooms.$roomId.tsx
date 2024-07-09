@@ -1,9 +1,11 @@
 import { useRef } from 'react';
-import { useQuery } from './features/query/use-query'
+import { useParams } from 'react-router-dom';
+import { useRoom } from '../features/query/use-room';
 
-function App() {
+export function Page() {
+  const { roomId } = useParams();
   const timerRef = useRef<number>();
-  const { users, myName, wsRef } = useQuery(import.meta.env.PROD ? location.host : import.meta.env.VITE_API, {
+  const { users, myName, wsRef } = useRoom(roomId!, {
     onready: () => {
       timerRef.current = setTimeout(() => {
         open(`steam://rungameid/${import.meta.env.VITE_GAME_ID}`);
@@ -45,5 +47,3 @@ function App() {
     </>
   )
 }
-
-export default App
