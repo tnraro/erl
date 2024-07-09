@@ -12,7 +12,7 @@ export function useQuery(path: string, options: { onready?: () => void, oncancel
     const client = treaty<App>(path);
     clientRef.current = client;
 
-    const ws = client.ws.subscribe();
+    const ws = client.api.ws({ roomId: "room" }).subscribe();
     wsRef.current = ws;
     ws.subscribe(({ data }) => {
       switch (data.type) {

@@ -8,7 +8,7 @@ export const app = new Elysia()
   .decorate({
     users: new Map<string, string>(),
   })
-  .ws("/ws", {
+  .ws("/api/ws/:roomId", {
     body: t.Object({
       type: t.Literal("rename"),
       name: t.String(),
@@ -26,9 +26,9 @@ export const app = new Elysia()
     open(ws) {
       ws.data.users.set(ws.id, generateNickname());
       console.log("open", ws.data.users.get(ws.id), ws.id);
-      ws.subscribe("room");
+      ws.subscribe(ws.data.params.roomId);
 
-      ws.publish("room", { type: "users", users: [...ws.data.users.values()] });
+      ws.publish(ws.data.params.roomId, { type: "users", users: [...ws.data.users.values()] });
       ws.send({ type: "users", users: [...ws.data.users.values()] });
       ws.send({ type: "me", name: ws.data.users.get(ws.id)! });
 
@@ -50,7 +50,7 @@ export const app = new Elysia()
       switch (message.type) {
         case "rename": {
           ws.data.users.set(ws.id, message.name);
-          ws.publish("room", { type: "users", users: [...ws.data.users.values()] });
+          ws.publish(ws.data.params.roomId, { type: "users", users: [...ws.data.users.values()] });
           ws.send({ type: "users", users: [...ws.data.users.values()] });
           ws.send({ type: "me", name: ws.data.users.get(ws.id)! });
           break;
@@ -63,9 +63,9 @@ export const app = new Elysia()
     close(ws) {
       console.log("close", ws.data.users.get(ws.id), ws.id);
       ws.data.users.delete(ws.id);
-      server.server?.publish("room", JSON.stringify({ type: "users", users: [...ws.data.users.values()] }));
+      server.server?.publish(ws.data.params.roomId, JSON.stringify({ type: "users", users: [...ws.data.users.values()] }));
 
-      ws.unsubscribe("room");
+      ws.unsubscribe(ws.data.params.roomId);
     },
     perMessageDeflate: true,
   });
