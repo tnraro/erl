@@ -1,9 +1,13 @@
-import { file } from "bun";
+import { env, file } from "bun";
 import Elysia, { t } from "elysia";
 import { RoomManager } from "./features/room/room-manager";
+import cors from "@elysiajs/cors";
 
 export type App = typeof app;
 export const app = new Elysia()
+  .use(cors({
+    origin: env.ORIGIN ?? "*",
+  }))
   .get("/assets/:filename", ({ params }) => file(`public/assets/${params.filename}`))
   .decorate({
     rooms: new RoomManager(),
